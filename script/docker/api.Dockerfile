@@ -13,6 +13,6 @@ EXPOSE 8080
 WORKDIR /app/
 
 COPY --from=builder /app/bin/api /app/api
-COPY --from=builder /app/config/config-api.yaml /app/config-api.yaml
+COPY --from=builder /app/config/http-api.yaml /app/http-api.yaml
 
-ENTRYPOINT ["./api", "-config", "config-api.yaml"]
+ENTRYPOINT ["./api", "-config", "http-api.yaml"]

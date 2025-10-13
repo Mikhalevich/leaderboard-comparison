@@ -1,0 +1,2 @@
+postgres:
+  connection: "postgres://leaderboard:leaderboard@postgres:5432/leaderboard"

@@ -16,11 +16,15 @@ build:
 test:
 	go test ./...
 
+vendor:
+	go mod tidy
+	go mod vendor
+
 compose-up:
-	docker-compose -f ./script/docker/docker-compose.yml up --build
+	docker compose -f ./script/docker/docker-compose.yml up --build
 
 compose-down:
-	docker-compose -f ./script/docker/docker-compose.yml down
+	docker compose -f ./script/docker/docker-compose.yml down
 
 install-linter:
 	if [ ! -f $(GOBIN)/$(LINTER_VERSION)/$(LINTER_NAME) ]; then \

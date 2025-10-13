@@ -3,14 +3,14 @@ services:
   api:
     build:
       context: ../../
-      dockerfile: script/docker/bot.Dockerfile
+      dockerfile: script/docker/api.Dockerfile
     depends_on:
-      jaeger:
-        condition: service_started
-      sql-migrate:
+      migrate:
         condition: service_completed_successfully
       redis:
         condition: service_healthy
+    ports:
+      - 8080:8080
     networks:
       - leaderboard-net
   postgres:
