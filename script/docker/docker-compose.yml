@@ -1,0 +1,56 @@
+version: "3"
+services:
+  api:
+    build:
+      context: ../../
+      dockerfile: script/docker/bot.Dockerfile
+    depends_on:
+      jaeger:
+        condition: service_started
+      sql-migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    networks:
+      - leaderboard-net
+  postgres:
+    image: postgres:18.0-alpine3.22
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: leaderboard
+      POSTGRES_USER: leaderboard
+      POSTGRES_PASSWORD: leaderboard
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U leaderboard"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+    networks:
+      - leaderboard-net
+  migrate:
+    build:
+      context: ../../
+      dockerfile: script/docker/migrate.Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - leaderboard-net
+  redis:
+    image: redis:8.2.2
+    ports:
+      - 6379:6379
+    environment:
+      - REDIS_PASSWORD=redis123
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+    networks:
+      - leaderboard-net
+networks:
+  leaderboard-net:
+    driver: bridge
