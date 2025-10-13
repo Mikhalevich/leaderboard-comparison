@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/scoregenerator"
 	"github.com/jackc/pgx/v5"
+
+	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/scoregenerator"
 )
 
 var (
