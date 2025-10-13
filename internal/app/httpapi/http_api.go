@@ -54,5 +54,5 @@ func Start(
 }
 
 func registerRoutes(mux *http.ServeMux, h *handler.Handler) {
-	mux.HandleFunc("/generate_test_data", h.GenerateTestData)
+	mux.HandleFunc("POST /generate_test_data", h.GenerateTestData)
 }
