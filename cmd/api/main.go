@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/Mikhalevich/leaderboard-comparison/internal/app/httpapi"
+	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/leaderboard"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/scoregenerator"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/infra"
 )
@@ -41,6 +42,7 @@ func main() {
 		if err := httpapi.Start(
 			ctx,
 			scoregenerator.New(pgDB),
+			leaderboard.New(pgDB),
 		); err != nil {
 			return fmt.Errorf("start http api: %w", err)
 		}

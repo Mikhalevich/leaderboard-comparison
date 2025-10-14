@@ -9,7 +9,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jinzhu/configor"
 
 	"github.com/Mikhalevich/leaderboard-comparison/internal/adapter/repository/postgres"
@@ -47,7 +47,7 @@ func MakePostgres(ctx context.Context, connection string) (*postgres.Postgres, f
 		return nil, func() {}, nil
 	}
 
-	conn, err := pgx.Connect(ctx, connection)
+	conn, err := pgxpool.New(ctx, connection)
 	if err != nil {
 		return nil, func() {}, fmt.Errorf("pgx connect: %w", err)
 	}
@@ -58,8 +58,7 @@ func MakePostgres(ctx context.Context, connection string) (*postgres.Postgres, f
 
 	p := postgres.New(conn)
 
-	//nolint:contextcheck
 	return p, func() {
-		conn.Close(context.Background())
+		conn.Close()
 	}, nil
 }
