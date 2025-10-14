@@ -3,11 +3,13 @@ package postgres
 import (
 	"github.com/jackc/pgx/v5"
 
+	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/leaderboard"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/scoregenerator"
 )
 
 var (
-	_ scoregenerator.Repository = (*Postgres)(nil)
+	_ scoregenerator.Repository   = (*Postgres)(nil)
+	_ leaderboard.LeaderboardRepo = (*Postgres)(nil)
 )
 
 type Postgres struct {
