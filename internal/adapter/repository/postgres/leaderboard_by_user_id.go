@@ -7,6 +7,10 @@ import (
 	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/leaderboard"
 )
 
+const (
+	halfRankRange = 2
+)
+
 func (p *Postgres) LeaderboardByUserID(
 	ctx context.Context,
 	userID int64,
@@ -18,7 +22,7 @@ func (p *Postgres) LeaderboardByUserID(
 				SELECT
 					user_id,
 					SUM(score) AS user_score,
-					ROW_NUMBER() OVER (ORDER BY SUM(score) DESC) AS position
+					ROW_NUMBER() OVER (ORDER BY SUM(score) DESC, MIN(created_at)) AS position
 				FROM
 					score
 				GROUP by
@@ -35,17 +39,17 @@ func (p *Postgres) LeaderboardByUserID(
 			WHERE
 				position >= (
 					SELECT
-						position - 5
+						position - $1
 					FROM
 						cte
 					WHERE
-						user_id = $1
+						user_id = $2
 				)
-			limit $2
+			limit $3
 		`
 	)
 
-	rows, err := p.db.Query(ctx, query, userID, limit)
+	rows, err := p.db.Query(ctx, query, limit/halfRankRange, userID, limit)
 	if err != nil {
 		return nil, fmt.Errorf("query rows: %w", err)
 	}

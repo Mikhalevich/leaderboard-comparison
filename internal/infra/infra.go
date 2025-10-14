@@ -11,8 +11,6 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jinzhu/configor"
-
-	"github.com/Mikhalevich/leaderboard-comparison/internal/adapter/repository/postgres"
 )
 
 func LoadConfig(cfg any) error {
@@ -42,7 +40,7 @@ func RunSignalInterruptionFunc(fn func(ctx context.Context) error) error {
 	return nil
 }
 
-func MakePostgres(ctx context.Context, connection string) (*postgres.Postgres, func(), error) {
+func MakePostgres(ctx context.Context, connection string) (*pgxpool.Pool, func(), error) {
 	if connection == "" {
 		return nil, func() {}, nil
 	}
@@ -56,9 +54,7 @@ func MakePostgres(ctx context.Context, connection string) (*postgres.Postgres, f
 		return nil, nil, fmt.Errorf("ping: %w", err)
 	}
 
-	p := postgres.New(conn)
-
-	return p, func() {
+	return conn, func() {
 		conn.Close()
 	}, nil
 }

@@ -1,0 +1,50 @@
+version: "3"
+services:
+  api:
+    build:
+      context: ../../
+      dockerfile: script/docker/api.Dockerfile
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - 8080:8080
+    networks:
+      - leaderboard-net
+  lbrecalculator:
+    build:
+      context: ../../
+      dockerfile: script/docker/lbrecalculator.Dockerfile
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - leaderboard-net
+  postgres:
+    image: postgres:18.0-alpine3.22
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: leaderboard
+      POSTGRES_USER: leaderboard
+      POSTGRES_PASSWORD: leaderboard
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U leaderboard"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+    networks:
+      - leaderboard-net
+  migrate:
+    build:
+      context: ../../
+      dockerfile: script/docker/migrate.Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - leaderboard-net
+networks:
+  leaderboard-net:
+    driver: bridge

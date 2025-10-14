@@ -6,12 +6,13 @@ BIN_PATH ?= $(ROOT)/bin
 LINTER_NAME := golangci-lint
 LINTER_VERSION := v2.5.0
 
-.PHONY: all build test vendor compose-up compose-down install-linter lint fmt install-migrate create-migration ab-bench
+.PHONY: all build test vendor pg-compose-up pg-compose-down mvpg-compose-up mvpg-compose-down install-linter lint fmt install-migrate create-migration ab-bench
 
 all: build
 
 build:
 	go build -mod=vendor -o $(BIN_PATH)/api ./cmd/api/main.go
+	go build -mod=vendor -o $(BIN_PATH)/lbrecalculator ./cmd/lbrecalculator/main.go
 
 test:
 	go test ./...
@@ -20,11 +21,17 @@ vendor:
 	go mod tidy
 	go mod vendor
 
-compose-up:
-	docker compose -f ./script/docker/docker-compose.yml up --build
+pg-compose-up:
+	docker compose -f ./script/docker/pg-docker-compose.yml up --build
 
-compose-down:
-	docker compose -f ./script/docker/docker-compose.yml down
+pg-compose-down:
+	docker compose -f ./script/docker/pg-docker-compose.yml down
+
+mvpg-compose-up:
+	docker compose -f ./script/docker/mvpg-docker-compose.yml up --build
+
+mvpg-compose-down:
+	docker compose -f ./script/docker/mvpg-docker-compose.yml down
 
 install-linter:
 	if [ ! -f $(GOBIN)/$(LINTER_VERSION)/$(LINTER_NAME) ]; then \
