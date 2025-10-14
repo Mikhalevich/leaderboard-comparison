@@ -18,7 +18,7 @@ func (p *Postgres) LeaderboardByUserID(
 				SELECT
 					user_id,
 					SUM(score) AS user_score,
-					ROW_NUMBER() OVER (ORDER BY SUM(score) DESC) AS position
+					ROW_NUMBER() OVER (ORDER BY SUM(score) DESC, MIN(created_at)) AS position
 				FROM
 					score
 				GROUP by

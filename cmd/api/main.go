@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/Mikhalevich/leaderboard-comparison/internal/adapter/repository/postgres"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/app/httpapi"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/leaderboard"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/scoregenerator"
@@ -32,10 +33,12 @@ func main() {
 	if err := infra.RunSignalInterruptionFunc(func(ctx context.Context) error {
 		slog.Info("api service starting")
 
-		pgDB, cleanup, err := infra.MakePostgres(ctx, cfg.Postgres.Connection)
+		pgxpool, cleanup, err := infra.MakePostgres(ctx, cfg.Postgres.Connection)
 		if err != nil {
 			return fmt.Errorf("make postgres db: %w", err)
 		}
+
+		pgDB := postgres.New(pgxpool)
 
 		defer cleanup()
 
