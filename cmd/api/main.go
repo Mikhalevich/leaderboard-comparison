@@ -6,7 +6,10 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	"github.com/Mikhalevich/leaderboard-comparison/internal/adapter/repository/postgres"
+	"github.com/Mikhalevich/leaderboard-comparison/internal/adapter/repository/postgres/mvleaderboard"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/app/httpapi"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/leaderboard"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/scoregenerator"
@@ -14,7 +17,8 @@ import (
 )
 
 type Config struct {
-	Postgres Postgres `yaml:"postgres" required:"true"`
+	Postgres               Postgres `yaml:"postgres" required:"true"`
+	IsMVLeaderboardEnabled bool     `yaml:"is_mv_leaderboard_enabled"`
 }
 
 type Postgres struct {
@@ -45,7 +49,7 @@ func main() {
 		if err := httpapi.Start(
 			ctx,
 			scoregenerator.New(pgDB),
-			leaderboard.New(pgDB),
+			makeLeaderboard(cfg.IsMVLeaderboardEnabled, pgDB, pgxpool),
 		); err != nil {
 			return fmt.Errorf("start http api: %w", err)
 		}
@@ -57,4 +61,12 @@ func main() {
 		slog.Error("failed run service", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
+}
+
+func makeLeaderboard(isMVEnabled bool, pgDB *postgres.Postgres, pgxpool *pgxpool.Pool) *leaderboard.Leaderboard {
+	if isMVEnabled {
+		return leaderboard.New(mvleaderboard.New(pgxpool))
+	}
+
+	return leaderboard.New(pgDB)
 }
