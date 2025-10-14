@@ -61,5 +61,6 @@ func registerRoutes(mux *http.ServeMux, h *handler.Handler) {
 	mux.HandleFunc("POST /generate_test_data", h.GenerateTestData)
 
 	mux.HandleFunc("GET /leaderboard/top", h.LeaderboardTop)
+	mux.HandleFunc("GET /leaderboard/random", h.LeaderboardByUserIDRandom)
 	mux.HandleFunc("GET /leaderboard/{user_id}", h.LeaderboardByUserID)
 }

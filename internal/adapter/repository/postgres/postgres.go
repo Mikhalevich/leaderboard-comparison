@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/leaderboard"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/scoregenerator"
@@ -13,10 +13,10 @@ var (
 )
 
 type Postgres struct {
-	db *pgx.Conn
+	db *pgxpool.Pool
 }
 
-func New(db *pgx.Conn) *Postgres {
+func New(db *pgxpool.Pool) *Postgres {
 	return &Postgres{
 		db: db,
 	}

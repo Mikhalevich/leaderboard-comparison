@@ -6,7 +6,7 @@ BIN_PATH ?= $(ROOT)/bin
 LINTER_NAME := golangci-lint
 LINTER_VERSION := v2.5.0
 
-.PHONY: all build test compose-up compose-down install-linter lint fmt install-migrate create-migration
+.PHONY: all build test vendor compose-up compose-down install-linter lint fmt install-migrate create-migration ab-bench
 
 all: build
 
@@ -47,3 +47,6 @@ install-migrate:
 
 create-migration: install-migrate
 	$(ENV_PATH) migrate create -ext sql -dir script/db/postgres/migrations -seq $(NAME)
+
+ab-bench:
+	docker run --rm --network=host jordi/ab -l -n 1000 -c 10 http://localhost:8080/leaderboard/random
