@@ -35,7 +35,7 @@ func (l *Leaderboard) Top(ctx context.Context, limit int) ([]LeaderbordEntry, er
 	return entries, nil
 }
 
-func (l *Leaderboard) PositionsByUserID(ctx context.Context, userID int64, limit int) ([]LeaderbordEntry, error) {
+func (l *Leaderboard) ByUserID(ctx context.Context, userID int64, limit int) ([]LeaderbordEntry, error) {
 	entries, err := l.repo.LeaderboardByUserID(ctx, userID, limit)
 	if err != nil {
 		return nil, fmt.Errorf("repo by user id: %w", err)

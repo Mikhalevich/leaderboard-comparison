@@ -19,10 +19,14 @@ const (
 func Start(
 	ctx context.Context,
 	scoreGenerator handler.ScoreGenerator,
+	leaderboardProcessor handler.LeaderboardProcessor,
 ) error {
 	var (
 		mux   = http.NewServeMux()
-		hndlr = handler.New(scoreGenerator)
+		hndlr = handler.New(
+			scoreGenerator,
+			leaderboardProcessor,
+		)
 	)
 
 	registerRoutes(mux, hndlr)
@@ -55,4 +59,7 @@ func Start(
 
 func registerRoutes(mux *http.ServeMux, h *handler.Handler) {
 	mux.HandleFunc("POST /generate_test_data", h.GenerateTestData)
+
+	mux.HandleFunc("GET /leaderboard/top", h.LeaderboardTop)
+	mux.HandleFunc("GET /leaderboard/{user_id}", h.LeaderboardByUserID)
 }
