@@ -11,15 +11,15 @@ type LeaderbordEntry struct {
 	Position int
 }
 
-type Repository interface {
+type TopNCalculator interface {
 	Top(ctx context.Context, limit int) ([]LeaderbordEntry, error)
 }
 
 type Leaderboard struct {
-	repo Repository
+	repo TopNCalculator
 }
 
-func New(repo Repository) *Leaderboard {
+func New(repo TopNCalculator) *Leaderboard {
 	return &Leaderboard{
 		repo: repo,
 	}

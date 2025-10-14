@@ -6,6 +6,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
+	"github.com/Mikhalevich/leaderboard-comparison/internal/adapter/repository/postgres/internal/transaction"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/scoregenerator"
 )
 
@@ -25,7 +26,7 @@ func (p *Postgres) AddUserScoreBatch(ctx context.Context, scores []scoregenerato
 		`
 	)
 
-	if err := p.transaction(ctx, func(tx pgx.Tx) error {
+	if err := transaction.Transaction(ctx, p.db, func(tx pgx.Tx) error {
 		for _, score := range scores {
 			if _, err := tx.Exec(
 				ctx,
