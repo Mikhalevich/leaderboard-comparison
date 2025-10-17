@@ -35,3 +35,4 @@ go.work.sum
 
 config/http-api.yaml
 config/lbrecalculator.yaml
+config/redis-lbrecalculator.yaml

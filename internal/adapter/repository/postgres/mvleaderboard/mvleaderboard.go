@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	_ leaderboardrecalculator.LatestTopRepository        = (*MVLeaderboard)(nil)
-	_ leaderboardrecalculator.StoreLeaderboardRepository = (*MVLeaderboard)(nil)
+	_ leaderboardrecalculator.LeaderboardTopRecalculator = (*MVLeaderboard)(nil)
+	_ leaderboardrecalculator.LeaderboardStorer          = (*MVLeaderboard)(nil)
 	_ leaderboard.LeaderboardRepo                        = (*MVLeaderboard)(nil)
 )
 
@@ -30,7 +30,10 @@ func New(db *pgxpool.Pool) *MVLeaderboard {
 	}
 }
 
-func (m *MVLeaderboard) LatestTop(ctx context.Context, limit int) ([]leaderboardrecalculator.LeaderboardEntry, error) {
+func (m *MVLeaderboard) LeaderboardTopRecalculate(
+	ctx context.Context,
+	limit int,
+) ([]leaderboardrecalculator.LeaderboardEntry, error) {
 	if _, err := m.db.Exec(ctx, "REFRESH MATERIALIZED VIEW score_leaderboard"); err != nil {
 		return nil, fmt.Errorf("refresh mat view: %w", err)
 	}

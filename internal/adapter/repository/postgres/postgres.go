@@ -4,12 +4,14 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/leaderboard"
+	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/leaderboardrecalculator"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/scoregenerator"
 )
 
 var (
-	_ scoregenerator.Repository   = (*Postgres)(nil)
-	_ leaderboard.LeaderboardRepo = (*Postgres)(nil)
+	_ scoregenerator.Repository                          = (*Postgres)(nil)
+	_ leaderboard.LeaderboardRepo                        = (*Postgres)(nil)
+	_ leaderboardrecalculator.LeaderboardTopRecalculator = (*Postgres)(nil)
 )
 
 type Postgres struct {

@@ -13,6 +13,7 @@ all: build
 build:
 	go build -mod=vendor -o $(BIN_PATH)/api ./cmd/api/main.go
 	go build -mod=vendor -o $(BIN_PATH)/lbrecalculator ./cmd/lbrecalculator/main.go
+	go build -mod=vendor -o $(BIN_PATH)/redislbrecalculator ./cmd/redislbrecalculator/main.go
 
 test:
 	go test ./...
@@ -32,6 +33,12 @@ mvpg-compose-up:
 
 mvpg-compose-down:
 	docker compose -f ./script/docker/mvpg-docker-compose.yml down
+
+redis-compose-up:
+	docker compose -f ./script/docker/redis-pg-docker-compose.yml up --build
+
+redis-compose-down:
+	docker compose -f ./script/docker/redis-pg-docker-compose.yml down
 
 install-linter:
 	if [ ! -f $(GOBIN)/$(LINTER_VERSION)/$(LINTER_NAME) ]; then \

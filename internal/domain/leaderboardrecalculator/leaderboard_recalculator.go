@@ -11,22 +11,22 @@ type LeaderboardEntry struct {
 	Position int
 }
 
-type LatestTopRepository interface {
-	LatestTop(ctx context.Context, limit int) ([]LeaderboardEntry, error)
+type LeaderboardTopRecalculator interface {
+	LeaderboardTopRecalculate(ctx context.Context, limit int) ([]LeaderboardEntry, error)
 }
 
-type StoreLeaderboardRepository interface {
+type LeaderboardStorer interface {
 	StoreLeaderbord(ctx context.Context, top []LeaderboardEntry) error
 }
 
 type LeaderboardRecalculator struct {
-	latestTopRepo        LatestTopRepository
-	storeLeaderboardRepo StoreLeaderboardRepository
+	latestTopRepo        LeaderboardTopRecalculator
+	storeLeaderboardRepo LeaderboardStorer
 }
 
 func New(
-	latestTopRepo LatestTopRepository,
-	storeLeaderboardRepo StoreLeaderboardRepository,
+	latestTopRepo LeaderboardTopRecalculator,
+	storeLeaderboardRepo LeaderboardStorer,
 ) *LeaderboardRecalculator {
 	return &LeaderboardRecalculator{
 		latestTopRepo:        latestTopRepo,
@@ -35,7 +35,7 @@ func New(
 }
 
 func (l *LeaderboardRecalculator) Recalculate(ctx context.Context, limit int) error {
-	top, err := l.latestTopRepo.LatestTop(ctx, limit)
+	top, err := l.latestTopRepo.LeaderboardTopRecalculate(ctx, limit)
 	if err != nil {
 		return fmt.Errorf("latest top repo: %w", err)
 	}

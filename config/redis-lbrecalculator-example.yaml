@@ -1,0 +1,8 @@
+postgres:
+  connection: "postgres://leaderboard:leaderboard@postgres:5432/leaderboard"
+redis:
+  addr: "redis:6379"
+  pwd: "redis123"
+  db: 1
+  ttl: 1h
+interval: 10s

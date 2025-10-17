@@ -38,12 +38,12 @@ func main() {
 	if err := infra.RunSignalInterruptionFunc(func(ctx context.Context) error {
 		slog.Info("lbrecalculator service starting")
 
-		pgxpool, cleanup, err := infra.MakePostgres(ctx, cfg.Postgres.Connection)
+		pgxpool, pgCleanup, err := infra.MakePostgres(ctx, cfg.Postgres.Connection)
 		if err != nil {
 			return fmt.Errorf("make postgres db: %w", err)
 		}
 
-		defer cleanup()
+		defer pgCleanup()
 
 		var (
 			mvPg         = mvleaderboard.New(pgxpool)
@@ -52,7 +52,7 @@ func main() {
 
 		scheduler.Run(
 			ctx,
-			"leaderboard_relactulator",
+			"mv_leaderboard_relactulator",
 			cfg.Interval,
 			true,
 			func(ctx context.Context) error {
