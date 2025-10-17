@@ -7,7 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/Mikhalevich/leaderboard-comparison/internal/adapter/repository/postgres/mvleaderboard"
+	"github.com/Mikhalevich/leaderboard-comparison/internal/adapter/leaderboardstorer"
+	"github.com/Mikhalevich/leaderboard-comparison/internal/adapter/repository/postgres"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/leaderboardrecalculator"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/infra"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/infra/scheduler"
@@ -19,11 +20,18 @@ const (
 
 type Config struct {
 	Postgres Postgres      `yaml:"postgres" required:"true"`
+	Redis    Redis         `yaml:"redis" required:"true"`
 	Interval time.Duration `yaml:"interval" required:"true"`
 }
 
 type Postgres struct {
 	Connection string `yaml:"connection" required:"true"`
+}
+
+type Redis struct {
+	Addr string `yaml:"addr" required:"true"`
+	Pwd  string `yaml:"pwd" required:"true"`
+	DB   int    `yaml:"db" required:"true"`
 }
 
 func main() {
@@ -36,23 +44,31 @@ func main() {
 	}
 
 	if err := infra.RunSignalInterruptionFunc(func(ctx context.Context) error {
-		slog.Info("lbrecalculator service starting")
+		slog.Info("redis_lb_recalculator service starting")
 
 		pgxpool, pgCleanup, err := infra.MakePostgres(ctx, cfg.Postgres.Connection)
 		if err != nil {
-			return fmt.Errorf("make postgres db: %w", err)
+			return fmt.Errorf("connect to postgres db: %w", err)
 		}
 
 		defer pgCleanup()
 
+		rdb, redisCleanup, err := infra.MakeRedis(ctx, cfg.Redis.Addr, cfg.Redis.Pwd, cfg.Redis.DB)
+		if err != nil {
+			return fmt.Errorf("connect to redis db: %w", err)
+		}
+
+		defer redisCleanup()
+
 		var (
-			mvPg         = mvleaderboard.New(pgxpool)
-			recalculator = leaderboardrecalculator.New(mvPg, mvPg)
+			pgDB         = postgres.New(pgxpool)
+			redisDB      = leaderboardstorer.New(rdb)
+			recalculator = leaderboardrecalculator.New(pgDB, redisDB)
 		)
 
 		scheduler.Run(
 			ctx,
-			"mv_leaderboard_relactulator",
+			"redis_leaderboard_relactulator",
 			cfg.Interval,
 			true,
 			func(ctx context.Context) error {
@@ -63,7 +79,7 @@ func main() {
 				return nil
 			})
 
-		slog.Info("lbrecalculator service stopped")
+		slog.Info("redis_lb_recalculator service stopped")
 
 		return nil
 	}); err != nil {

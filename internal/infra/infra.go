@@ -11,6 +11,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jinzhu/configor"
+	"github.com/redis/go-redis/v9"
 )
 
 func LoadConfig(cfg any) error {
@@ -56,5 +57,26 @@ func MakePostgres(ctx context.Context, connection string) (*pgxpool.Pool, func()
 
 	return conn, func() {
 		conn.Close()
+	}, nil
+}
+
+func MakeRedis(
+	ctx context.Context,
+	addr string,
+	passwd string,
+	db int,
+) (*redis.Client, func(), error) {
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     addr,
+		Password: passwd,
+		DB:       db,
+	})
+
+	if err := rdb.Ping(ctx).Err(); err != nil {
+		return nil, nil, fmt.Errorf("redis ping: %w", err)
+	}
+
+	return rdb, func() {
+		rdb.Close()
 	}, nil
 }
