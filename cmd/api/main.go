@@ -9,10 +9,10 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 
+	"github.com/Mikhalevich/leaderboard-comparison/cmd/api/httpapi"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/adapter/leaderboardstorer"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/adapter/repository/postgres"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/adapter/repository/postgres/mvleaderboard"
-	"github.com/Mikhalevich/leaderboard-comparison/internal/app/httpapi"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/leaderboard"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/domain/scoregenerator"
 	"github.com/Mikhalevich/leaderboard-comparison/internal/infra"

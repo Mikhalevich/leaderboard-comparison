@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Mikhalevich/leaderboard-comparison/internal/app/httpapi/internal/handler"
+	"github.com/Mikhalevich/leaderboard-comparison/cmd/api/httpapi/internal/handler"
 )
 
 const (
